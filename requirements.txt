@@ -1,0 +1,6 @@
+Flask
+Pillow
+watchdog
+requests
+numpy
+pyperclip

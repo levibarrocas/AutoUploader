@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Koikatsu Cap Resizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a202c; color: #cbd5e0; }
+    </style>
+</head>
+<body class="p-6 font-sans">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-white">Settings</h1>
+            <div class="flex space-x-3">
+                <a href="/setup?force=1" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Run Setup
+                </a>
+                <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Back
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold text-white mb-4">Watch Folders</h2>
+            <p class="text-gray-400 text-sm mb-4">Directories to automatically monitor for new screenshots.</p>
+            
+            <div id="folders-list" class="space-y-3 mb-4">
+                <!-- Folders injected here -->
+            </div>
+            
+            <div class="flex space-x-3">
+                <input type="text" id="new-folder" placeholder="e.g. /path/to/folder/" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="addFolder()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
+                    Add Folder
+                </button>
+            </div>
+            
+            <hr class="border-gray-700 my-8">
+            
+            <h2 class="text-xl font-semibold text-white mb-4">API & Paths</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Output Folder</label>
+                    <input type="text" id="output-folder" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Catbox Userhash</label>
+                    <input type="text" id="catbox-userhash" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">ImgChest API Key</label>
+                    <input type="password" id="imgchest-api-key" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            
+            <hr class="border-gray-700 my-8">
+            
+            <h2 class="text-xl font-semibold text-white mb-4">Image Settings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Max Width</label>
+                    <input type="number" id="max-width" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Max Height</label>
+                    <input type="number" id="max-height" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">JPG Quality (1-100)</label>
+                    <input type="number" id="jpg-quality" min="1" max="100" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <hr class="border-gray-700 my-8">
+            
+            <h2 class="text-xl font-semibold text-white mb-4">Custom ShareX Uploaders</h2>
+            <p class="text-gray-400 text-sm mb-4">Paste ShareX custom uploader JSON configs here (as a JSON array <code class="bg-gray-900 px-1 rounded">[...]</code>) or drag & drop a <code>.sxcu</code> file.</p>
+            <div id="sxcu-dropzone" class="relative border-2 border-dashed border-transparent rounded transition-colors duration-200">
+                <textarea id="custom-uploaders" rows="8" class="bg-gray-700 text-gray-200 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder-gray-500" placeholder='[\n  {\n    "RequestURL": "https://...",\n    "FileFormName": "file"\n  }\n]'></textarea>
+                <div id="drop-overlay" class="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 rounded">
+                    <span class="text-white font-bold text-xl drop-shadow-md">Drop .sxcu file here to add</span>
+                </div>
+            </div>
+            <button onclick="saveUploaders()" class="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                Save Custom Uploaders
+            </button>
+            
+            <div id="custom-uploaders-list" class="space-y-3 mt-4"></div>
+
+            <hr class="border-gray-700 my-8">
+            
+            <h2 class="text-xl font-semibold text-white mb-4">Upload Priority Sequence</h2>
+            <p class="text-gray-400 text-sm mb-4">Configure the exact order the app will attempt to upload your captures.</p>
+            
+            <div id="sequence-list" class="space-y-3 mb-4">
+                <!-- Sequence injected here -->
+            </div>
+            
+            <div class="flex space-x-3">
+                <select id="new-sequence-item" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                <button onclick="addSequenceItem()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">Add</button>
+            </div>
+
+            <hr class="border-gray-700 my-8">
+            
+            <h2 class="text-xl font-semibold text-red-500 mb-4">Danger Zone</h2>
+            <div class="bg-gray-700 p-4 rounded-lg flex items-center justify-between border border-red-900">
+                <div>
+                    <h3 class="text-white font-bold">Clear History</h3>
+                    <p class="text-gray-400 text-sm mt-1">This will permanently wipe all history records from your database. Images will remain on disk.</p>
+                </div>
+                <button onclick="clearHistory()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
+                    Clear History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let settings = { watch_folders: [], output_folder: "", catbox_userhash: "", imgchest_api_key: "", uploaders: [], upload_sequence: [], max_width: 2000, max_height: 2000, jpg_quality: 95 };
+
+        async function fetchSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                settings = await response.json();
+                if (!settings.upload_sequence) settings.upload_sequence = ["catbox", "imgchest"];
+                
+                document.getElementById('output-folder').value = settings.output_folder || "";
+                document.getElementById('catbox-userhash').value = settings.catbox_userhash || "";
+                document.getElementById('imgchest-api-key').value = settings.imgchest_api_key || "";
+                document.getElementById('custom-uploaders').value = JSON.stringify(settings.uploaders || [], null, 2);
+                document.getElementById('max-width').value = settings.max_width || 2000;
+                document.getElementById('max-height').value = settings.max_height || 2000;
+                document.getElementById('jpg-quality').value = settings.jpg_quality || 95;
+                
+                renderFolders();
+                renderSequence();
+                renderUploaders();
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        }
+
+        function renderFolders() {
+            const list = document.getElementById('folders-list');
+            list.innerHTML = '';
+            settings.watch_folders.forEach((folder, index) => {
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
+                el.innerHTML = `
+                    <span class="text-gray-200 truncate pr-4">${folder}</span>
+                    <button onclick="removeFolder(${index})" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1 px-3 rounded transition duration-200">
+                        Remove
+                    </button>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        async function saveSettings() {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+        }
+
+        async function addFolder() {
+            const input = document.getElementById('new-folder');
+            const folder = input.value.trim();
+            if (folder && !settings.watch_folders.includes(folder)) {
+                settings.watch_folders.push(folder);
+                input.value = '';
+                renderFolders();
+                await saveSettings();
+            }
+        }
+
+        async function removeFolder(index) {
+            settings.watch_folders.splice(index, 1);
+            renderFolders();
+            await saveSettings();
+        }
+
+        async function saveGeneralSettings() {
+            settings.output_folder = document.getElementById('output-folder').value;
+            settings.catbox_userhash = document.getElementById('catbox-userhash').value;
+            settings.imgchest_api_key = document.getElementById('imgchest-api-key').value;
+            settings.max_width = parseInt(document.getElementById('max-width').value) || 2000;
+            settings.max_height = parseInt(document.getElementById('max-height').value) || 2000;
+            settings.jpg_quality = parseInt(document.getElementById('jpg-quality').value) || 95;
+            await saveSettings();
+        }
+
+        async function saveUploaders() {
+            try {
+                const parsed = JSON.parse(document.getElementById('custom-uploaders').value);
+                if (!Array.isArray(parsed)) throw new Error("Must be a JSON array (start with [ and end with ]).");
+                settings.uploaders = parsed;
+                await saveSettings();
+                renderSequence();
+                renderUploaders();
+                alert("Custom uploaders saved!");
+            } catch (e) {
+                alert("Invalid JSON format: " + e.message);
+            }
+        }
+
+        function renderUploaders() {
+            const list = document.getElementById('custom-uploaders-list');
+            list.innerHTML = '';
+            if (settings.uploaders && settings.uploaders.length > 0) {
+                settings.uploaders.forEach((u, index) => {
+                    const el = document.createElement('div');
+                    el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
+                    const name = u.Name || u.RequestURL;
+                    el.innerHTML = `
+                        <span class="text-gray-200 truncate pr-4">${name}</span>
+                        <button onclick="testUploader(${index}, this)" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-1 px-3 rounded transition duration-200">
+                            Test Upload
+                        </button>
+                    `;
+                    list.appendChild(el);
+                });
+            }
+        }
+
+        async function testUploader(index, btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "Testing...";
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            try {
+                const response = await fetch('/api/test_uploader', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ index: index })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert("Success! Uploaded to: " + data.url);
+                } else {
+                    alert("Test failed: " + data.error);
+                }
+            } catch (error) {
+                alert("Error during test: " + error.message);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function renderSequence() {
+            const list = document.getElementById('sequence-list');
+            list.innerHTML = '';
+            settings.upload_sequence.forEach((dest, index) => {
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
+                
+                let label = dest;
+                if (dest === "catbox") label = "Catbox";
+                else if (dest === "imgchest") label = "ImgChest";
+                else if (dest.startsWith("sharex:")) label = "Custom: " + dest.substring(7);
+
+                el.innerHTML = `
+                    <span class="text-gray-200 truncate pr-4">${label}</span>
+                    <div class="flex space-x-2">
+                        <button onclick="moveSequence(${index}, -1)" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded transition duration-200" ${index === 0 ? 'style="opacity: 0.5; cursor: not-allowed;" disabled' : ''}>↑</button>
+                        <button onclick="moveSequence(${index}, 1)" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded transition duration-200" ${index === settings.upload_sequence.length - 1 ? 'style="opacity: 0.5; cursor: not-allowed;" disabled' : ''}>↓</button>
+                        <button onclick="removeSequence(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition duration-200">✕</button>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+
+            const select = document.getElementById('new-sequence-item');
+            select.innerHTML = '';
+            const available = [{val: "catbox", label: "Catbox"}, {val: "imgchest", label: "ImgChest"}];
+            if (settings.uploaders) {
+                settings.uploaders.forEach(u => {
+                    const val = "sharex:" + (u.Name || u.RequestURL);
+                    available.push({val: val, label: "Custom: " + (u.Name || u.RequestURL)});
+                });
+            }
+            
+            let hasOptions = false;
+            available.forEach(opt => {
+                if (!settings.upload_sequence.includes(opt.val)) {
+                    const o = document.createElement('option');
+                    o.value = opt.val;
+                    o.textContent = opt.label;
+                    select.appendChild(o);
+                    hasOptions = true;
+                }
+            });
+            if (!hasOptions) select.innerHTML = '<option disabled>All destinations added</option>';
+        }
+
+        async function addSequenceItem() {
+            const select = document.getElementById('new-sequence-item');
+            if (select.value && !select.options[select.selectedIndex].disabled) {
+                settings.upload_sequence.push(select.value);
+                renderSequence();
+                await saveSettings();
+            }
+        }
+
+        async function removeSequence(index) {
+            settings.upload_sequence.splice(index, 1);
+            renderSequence();
+            await saveSettings();
+        }
+
+        async function moveSequence(index, dir) {
+            if (index + dir < 0 || index + dir >= settings.upload_sequence.length) return;
+            const temp = settings.upload_sequence[index];
+            settings.upload_sequence[index] = settings.upload_sequence[index + dir];
+            settings.upload_sequence[index + dir] = temp;
+            renderSequence();
+            await saveSettings();
+        }
+
+        async function clearHistory() {
+            if (confirm("⚠️ WARNING: This action cannot be undone!\n\nAre you absolutely sure you want to permanently clear all history records?")) {
+                await fetch('/api/clear', { method: 'POST' });
+                alert("History cleared successfully.");
+            }
+        }
+
+        const dropzone = document.getElementById('sxcu-dropzone');
+        const dropOverlay = document.getElementById('drop-overlay');
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropOverlay.classList.remove('opacity-0');
+            dropzone.classList.remove('border-transparent');
+            dropzone.classList.add('border-blue-500');
+        });
+
+        dropzone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropOverlay.classList.add('opacity-0');
+            dropzone.classList.add('border-transparent');
+            dropzone.classList.remove('border-blue-500');
+        });
+
+        dropzone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropOverlay.classList.add('opacity-0');
+            dropzone.classList.add('border-transparent');
+            dropzone.classList.remove('border-blue-500');
+
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const parsed = JSON.parse(text);
+                settings.uploaders = settings.uploaders || [];
+                settings.uploaders.push(...(Array.isArray(parsed) ? parsed : [parsed]));
+                document.getElementById('custom-uploaders').value = JSON.stringify(settings.uploaders, null, 2);
+                await saveSettings();
+                renderSequence();
+                renderUploaders();
+                alert("Custom uploader added from file!");
+            } catch (error) {
+                alert("Failed to parse file: " + error.message);
+            }
+        });
+
+        fetchSettings();
+    </script>
+</body>
+</html>

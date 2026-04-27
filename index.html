@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koikatsu Cap Resizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a202c; color: #cbd5e0; }
+    </style>
+</head>
+<body class="p-6 font-sans">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-white">Recent Captures</h1>
+            <div class="flex space-x-3">
+                <a href="/settings" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Settings
+                </a>
+                <button onclick="clearHistory()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Clear History
+                </button>
+            </div>
+        </div>
+        <div id="history-list" class="space-y-4">
+            <!-- Items will be injected here -->
+        </div>
+    </div>
+
+    <script>
+        async function fetchHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+                renderHistory(data);
+            } catch (error) {
+                console.error("Error fetching history:", error);
+            }
+        }
+
+        function renderHistory(data) {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            data.forEach(item => {
+                const filename = item.path.split('/').pop();
+                const date = new Date(item.timestamp * 1000).toLocaleString();
+                
+                const el = document.createElement('div');
+                el.className = "bg-gray-800 p-4 rounded-lg shadow flex items-center space-x-6 transition-all hover:bg-gray-700";
+                el.innerHTML = `
+                    <div class="flex-shrink-0 w-32 h-32 bg-black flex items-center justify-center rounded overflow-hidden shadow-inner">
+                        <img src="/images/${filename}" alt="${filename}" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h2 class="text-xl font-semibold text-white truncate" title="${filename}">${filename}</h2>
+                        <p class="text-gray-400 text-sm mb-3">${date}</p>
+                        <div class="flex items-center space-x-3">
+                            <input type="text" readonly value="${item.url}" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button onclick="copyToClipboard(this, '${item.url}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        async function clearHistory() {
+            if(confirm("Are you sure you want to clear the history?")) {
+                await fetch('/api/clear', { method: 'POST' });
+                fetchHistory();
+            }
+        }
+
+        function copyToClipboard(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const oldText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.replace('bg-blue-600', 'bg-green-600');
+                btn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                setTimeout(() => {
+                    btn.innerText = oldText;
+                    btn.classList.replace('bg-green-600', 'bg-blue-600');
+                    btn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                }, 2000);
+            });
+        }
+
+        setInterval(fetchHistory, 2000);
+        fetchHistory();
+    </script>
+</body>
+</html>

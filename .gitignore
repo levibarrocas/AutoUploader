@@ -1,0 +1,9 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore personal settings and databases
+settings.json
+history.json
+history.db
+output/
