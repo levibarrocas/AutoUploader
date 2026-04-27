@@ -111,7 +111,7 @@ def api_history():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         
-        query = "SELECT path, url, timestamp FROM history"
+        query = "SELECT id, path, url, timestamp FROM history"
         params = []
         conditions = []
         
@@ -148,6 +148,14 @@ def clear_history():
     with sqlite3.connect(DB_FILE) as conn:
         c = conn.cursor()
         c.execute("DELETE FROM history")
+        conn.commit()
+    return jsonify({"status": "ok"})
+
+@app.route('/api/delete/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    with sqlite3.connect(DB_FILE) as conn:
+        c = conn.cursor()
+        c.execute("DELETE FROM history WHERE id = ?", (item_id,))
         conn.commit()
     return jsonify({"status": "ok"})
 

@@ -176,11 +176,21 @@
                                 <button onclick="copyToClipboard(this, '${item.url}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
                                     Copy Link
                                 </button>
+                                <button onclick="deleteItem(${item.id})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
+                                    Remove from History
+                                </button>
                             </div>
                         </div>
                     `;
                     list.appendChild(el);
                 });
+            }
+        }
+
+        async function deleteItem(id) {
+            if(confirm("Are you sure you want to remove this capture from the history?")) {
+                await fetch(`/api/delete/${id}`, { method: 'POST' });
+                fetchHistory();
             }
         }
 
