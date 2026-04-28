@@ -1,80 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto Uploader</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #1a202c; color: #cbd5e0; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="p-6 font-sans">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Recent Captures</h1>
-            <div class="flex space-x-3">
-                <button onclick="toggleDateFilter()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Toggle Dates
+<body>
+    <div style="max-width:1440px;margin:0 auto;">
+        <div class="page-header">
+            <div class="header-brand">
+                <div class="brand-bar"></div>
+                <h1>Recent Captures</h1>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleDateFilter()" class="btn-icon" data-tip="Filter by Date">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </button>
-                <button id="toggle-btn" onclick="toggleMode()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Gallery Mode
+                <button id="toggle-btn" onclick="toggleMode()" class="btn-icon" data-tip="Gallery Mode">
+                    <svg id="icon-gallery" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <svg id="icon-list" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 </button>
-                <a href="/settings" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Settings
+                <a href="/settings" class="btn-icon accent" data-tip="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </a>
+                <button onclick="toggleTheme()" class="btn-icon" id="theme-btn" data-tip="Toggle Theme">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
             </div>
         </div>
-        <div id="date-filter-container" class="hidden flex-wrap items-center gap-3 mb-6 bg-gray-800 p-4 rounded-lg shadow">
-            <label class="text-white font-bold">Date Range:</label>
-            <input type="date" id="start-date" onchange="applyDateFilter()" class="bg-gray-700 text-gray-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <span class="text-gray-400">to</span>
-            <input type="date" id="end-date" onchange="applyDateFilter()" class="bg-gray-700 text-gray-200 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="clearDateFilter()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                Clear
+
+        <div id="date-filter-container" class="filter-bar">
+            <span class="filter-label">Date Range</span>
+            <input type="date" id="start-date" onchange="applyDateFilter()">
+            <span class="filter-sep">→</span>
+            <input type="date" id="end-date" onchange="applyDateFilter()">
+            <button onclick="clearDateFilter()" class="btn-icon danger" data-tip="Clear Filter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
-        <div id="history-list" class="space-y-4">
-            <!-- Items will be injected here -->
-        </div>
-        
-        <div class="flex justify-center items-center space-x-4 mt-8 mb-4">
-            <button id="prev-page" onclick="changePage(-1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Previous</button>
-            <span class="text-white font-bold">Page <span id="current-page-display">1</span></span>
-            <button id="next-page" onclick="changePage(1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Next</button>
+
+        <div id="history-list"></div>
+
+        <div class="pagination">
+            <button id="prev-page" onclick="changePage(-1)" class="btn-icon" data-tip="Previous Page" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="page-indicator">PAGE <span id="current-page-display">1</span></span>
+            <button id="next-page" onclick="changePage(1)" class="btn-icon" data-tip="Next Page" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+    <div id="toast-container"></div>
 
     <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const sun = document.getElementById('icon-sun');
+            const moon = document.getElementById('icon-moon');
+            if (sun && moon) {
+                sun.style.display = saved === 'light' ? 'block' : 'none';
+                moon.style.display = saved === 'dark' ? 'block' : 'none';
+            }
+        })();
+
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('icon-sun').style.display = next === 'light' ? 'block' : 'none';
+            document.getElementById('icon-moon').style.display = next === 'dark' ? 'block' : 'none';
+        }
+
         let currentData = [];
         let isGalleryMode = localStorage.getItem('galleryMode') === 'true';
         let lastLatestTimestamp = 0;
         let isFirstLoad = true;
         let currentPage = 1;
 
-        function applyDateFilter() {
-            isFirstLoad = true;
-            currentPage = 1;
-            fetchHistory();
-        }
-        
+        const ICON_COPY = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+        const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const ICON_TRASH = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+
+        function applyDateFilter() { isFirstLoad = true; currentPage = 1; fetchHistory(); }
+
         function clearDateFilter() {
             document.getElementById('start-date').value = '';
             document.getElementById('end-date').value = '';
             applyDateFilter();
         }
-        
+
         function toggleDateFilter() {
-            const container = document.getElementById('date-filter-container');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                container.classList.add('flex');
-            } else {
-                container.classList.add('hidden');
-                container.classList.remove('flex');
+            const c = document.getElementById('date-filter-container');
+            c.classList.toggle('open');
+            if (!c.classList.contains('open')) {
                 document.getElementById('start-date').value = '';
                 document.getElementById('end-date').value = '';
                 applyDateFilter();
@@ -92,7 +118,6 @@
             try {
                 const startVal = document.getElementById('start-date').value;
                 const endVal = document.getElementById('end-date').value;
-                
                 let url = '/api/history';
                 const params = new URLSearchParams();
                 if (startVal) params.append('start', new Date(startVal + 'T00:00:00').getTime() / 1000);
@@ -102,15 +127,12 @@
 
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 if (currentPage === 1 && data.length > 0) {
                     const currentLatestTimestamp = data[0].timestamp;
                     if (!isFirstLoad && currentLatestTimestamp > lastLatestTimestamp) {
-                        const newItems = data.filter(item => item.timestamp > lastLatestTimestamp);
-                        newItems.forEach(item => {
-                            const filename = item.path.split('/').pop();
-                            showToast(`New capture uploaded: ${filename}`);
-                        });
+                        data.filter(i => i.timestamp > lastLatestTimestamp)
+                            .forEach(i => showToast('New capture: ' + i.path.split('/').pop()));
                     }
                     lastLatestTimestamp = currentLatestTimestamp;
                 }
@@ -132,53 +154,56 @@
 
         function updateToggleButton() {
             const btn = document.getElementById('toggle-btn');
-            if (btn) {
-                btn.innerText = isGalleryMode ? 'List Mode' : 'Gallery Mode';
+            const gi = document.getElementById('icon-gallery');
+            const li = document.getElementById('icon-list');
+            if (isGalleryMode) {
+                gi.style.display = 'none'; li.style.display = 'block';
+                btn.setAttribute('data-tip', 'List Mode');
+            } else {
+                gi.style.display = 'block'; li.style.display = 'none';
+                btn.setAttribute('data-tip', 'Gallery Mode');
             }
         }
 
         function renderHistory(data) {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
-            
+
             if (isGalleryMode) {
-                list.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4";
+                list.className = 'gallery-grid';
+                list.style = '';
                 data.forEach(item => {
                     const filename = item.path.split('/').pop();
                     const el = document.createElement('div');
-                    el.className = "bg-gray-800 rounded-lg shadow overflow-hidden aspect-square relative group cursor-pointer flex items-center justify-center bg-black";
+                    el.className = 'gallery-cell';
                     el.onclick = () => copyGalleryLink(el, item.url);
                     el.innerHTML = `
-                        <img src="/images/${filename}" alt="${filename}" class="max-w-full max-h-full object-contain">
-                        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <span class="text-white font-bold text-lg pointer-events-none status-text">Copy URL</span>
+                        <img src="/images/${filename}" alt="${filename}">
+                        <div class="gallery-overlay">
+                            <span class="gallery-overlay-text status-text">Copy URL</span>
                         </div>
                     `;
                     list.appendChild(el);
                 });
             } else {
-                list.className = "space-y-4";
+                list.className = 'list-wrap';
+                list.style = '';
                 data.forEach(item => {
                     const filename = item.path.split('/').pop();
                     const date = new Date(item.timestamp * 1000).toLocaleString();
-                    
                     const el = document.createElement('div');
-                    el.className = "bg-gray-800 p-4 rounded-lg shadow flex items-center space-x-6 transition-all hover:bg-gray-700";
+                    el.className = 'history-item';
                     el.innerHTML = `
-                        <div class="flex-shrink-0 w-32 h-32 bg-black flex items-center justify-center rounded overflow-hidden shadow-inner">
-                            <img src="/images/${filename}" alt="${filename}" class="max-w-full max-h-full object-contain">
+                        <div class="thumb-wrap">
+                            <img src="/images/${filename}" alt="${filename}">
                         </div>
-                        <div class="flex-grow min-w-0">
-                            <h2 class="text-xl font-semibold text-white truncate" title="${filename}">${filename}</h2>
-                            <p class="text-gray-400 text-sm mb-3">${date}</p>
-                            <div class="flex items-center space-x-3">
-                                <input type="text" readonly value="${item.url}" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button onclick="copyToClipboard(this, '${item.url}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
-                                    Copy Link
-                                </button>
-                                <button onclick="deleteItem(${item.id})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
-                                    Remove from History
-                                </button>
+                        <div class="item-meta">
+                            <div class="item-name" title="${filename}">${filename}</div>
+                            <div class="item-date">${date}</div>
+                            <div class="item-actions">
+                                <input type="text" readonly value="${item.url}">
+                                <button onclick="copyToClipboard(this, '${item.url}')" class="btn-icon accent" data-tip="Copy Link">${ICON_COPY}</button>
+                                <button onclick="deleteItem(${item.id})" class="btn-icon danger" data-tip="Remove from History">${ICON_TRASH}</button>
                             </div>
                         </div>
                     `;
@@ -188,44 +213,39 @@
         }
 
         async function deleteItem(id) {
-            if(confirm("Are you sure you want to remove this capture from the history?")) {
+            if (confirm("Remove this capture from history?")) {
                 await fetch(`/api/delete/${id}`, { method: 'POST' });
                 fetchHistory();
             }
         }
 
         function updatePaginationControls(fetchedCount) {
-            const prevBtn = document.getElementById('prev-page');
-            const nextBtn = document.getElementById('next-page');
             document.getElementById('current-page-display').innerText = currentPage;
-            
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = fetchedCount < 200;
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = fetchedCount < 200;
         }
 
         function copyToClipboard(btn, text) {
             navigator.clipboard.writeText(text).then(() => {
-                const oldText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.classList.replace('bg-blue-600', 'bg-green-600');
-                btn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                btn.innerHTML = ICON_CHECK;
+                btn.classList.remove('accent'); btn.classList.add('success');
                 setTimeout(() => {
-                    btn.innerText = oldText;
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
-                    btn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                    btn.innerHTML = ICON_COPY;
+                    btn.classList.remove('success'); btn.classList.add('accent');
                 }, 2000);
             });
         }
-        
+
         function copyGalleryLink(el, text) {
             navigator.clipboard.writeText(text).then(() => {
-                const statusSpan = el.querySelector('.status-text');
-                const oldText = statusSpan.innerText;
-                statusSpan.innerText = 'Copied!';
-                statusSpan.classList.add('text-green-400');
+                const span = el.querySelector('.status-text');
+                span.innerText = 'Copied!';
+                span.style.color = 'var(--success)';
+                span.style.textShadow = '0 0 10px var(--success-glow)';
                 setTimeout(() => {
-                    statusSpan.innerText = oldText;
-                    statusSpan.classList.remove('text-green-400');
+                    span.innerText = 'Copy URL';
+                    span.style.color = '';
+                    span.style.textShadow = '';
                 }, 2000);
             });
         }
@@ -233,16 +253,12 @@
         function showToast(message) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = "bg-green-600 text-white font-bold py-3 px-5 rounded-lg shadow-xl transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto";
-            toast.innerHTML = `<span>${message}</span>`;
+            toast.className = 'toast';
+            toast.textContent = message;
             container.appendChild(toast);
-            
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            });
-
+            requestAnimationFrame(() => toast.classList.add('show'));
             setTimeout(() => {
-                toast.classList.add('translate-y-10', 'opacity-0');
+                toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
