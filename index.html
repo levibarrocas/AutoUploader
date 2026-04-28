@@ -1,33 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koikatsu Cap Resizer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #1a202c; color: #cbd5e0; }
-    </style>
+    <title>Auto Uploader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="p-6 font-sans">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Recent Captures</h1>
-            <div class="flex space-x-3">
-                <a href="/settings" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Settings
+<body>
+    <div style="max-width:1440px;margin:0 auto;">
+        <div class="page-header">
+            <div class="header-brand">
+                <div class="brand-bar"></div>
+                <h1>Recent Captures</h1>
+            </div>
+            <div class="header-actions">
+                <a href="/settings" class="btn-icon accent" data-tip="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </a>
-                <button onclick="clearHistory()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Clear History
+                <button onclick="clearHistory()" class="btn-icon danger" data-tip="Clear History">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
+                <button onclick="toggleTheme()" class="btn-icon" id="theme-btn" data-tip="Toggle Theme">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
             </div>
         </div>
-        <div id="history-list" class="space-y-4">
-            <!-- Items will be injected here -->
-        </div>
+
+        <div id="history-list" class="list-wrap"></div>
     </div>
 
     <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const sun = document.getElementById('icon-sun');
+            const moon = document.getElementById('icon-moon');
+            if (sun && moon) {
+                sun.style.display = saved === 'light' ? 'block' : 'none';
+                moon.style.display = saved === 'dark' ? 'block' : 'none';
+            }
+        })();
+
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('icon-sun').style.display = next === 'light' ? 'block' : 'none';
+            document.getElementById('icon-moon').style.display = next === 'dark' ? 'block' : 'none';
+        }
+
+        const ICON_COPY = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+        const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
         async function fetchHistory() {
             try {
                 const response = await fetch('/api/history');
@@ -44,21 +72,18 @@
             data.forEach(item => {
                 const filename = item.path.split('/').pop();
                 const date = new Date(item.timestamp * 1000).toLocaleString();
-                
                 const el = document.createElement('div');
-                el.className = "bg-gray-800 p-4 rounded-lg shadow flex items-center space-x-6 transition-all hover:bg-gray-700";
+                el.className = 'history-item';
                 el.innerHTML = `
-                    <div class="flex-shrink-0 w-32 h-32 bg-black flex items-center justify-center rounded overflow-hidden shadow-inner">
-                        <img src="/images/${filename}" alt="${filename}" class="max-w-full max-h-full object-contain">
+                    <div class="thumb-wrap">
+                        <img src="/images/${filename}" alt="${filename}">
                     </div>
-                    <div class="flex-grow min-w-0">
-                        <h2 class="text-xl font-semibold text-white truncate" title="${filename}">${filename}</h2>
-                        <p class="text-gray-400 text-sm mb-3">${date}</p>
-                        <div class="flex items-center space-x-3">
-                            <input type="text" readonly value="${item.url}" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button onclick="copyToClipboard(this, '${item.url}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
-                                Copy Link
-                            </button>
+                    <div class="item-meta">
+                        <div class="item-name" title="${filename}">${filename}</div>
+                        <div class="item-date">${date}</div>
+                        <div class="item-actions">
+                            <input type="text" readonly value="${item.url}">
+                            <button onclick="copyToClipboard(this, '${item.url}')" class="btn-icon accent" data-tip="Copy Link">${ICON_COPY}</button>
                         </div>
                     </div>
                 `;
@@ -67,7 +92,7 @@
         }
 
         async function clearHistory() {
-            if(confirm("Are you sure you want to clear the history?")) {
+            if (confirm("Are you sure you want to clear the history?")) {
                 await fetch('/api/clear', { method: 'POST' });
                 fetchHistory();
             }
@@ -75,14 +100,11 @@
 
         function copyToClipboard(btn, text) {
             navigator.clipboard.writeText(text).then(() => {
-                const oldText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.classList.replace('bg-blue-600', 'bg-green-600');
-                btn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                btn.innerHTML = ICON_CHECK;
+                btn.classList.remove('accent'); btn.classList.add('success');
                 setTimeout(() => {
-                    btn.innerText = oldText;
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
-                    btn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                    btn.innerHTML = ICON_COPY;
+                    btn.classList.remove('success'); btn.classList.add('accent');
                 }, 2000);
             });
         }

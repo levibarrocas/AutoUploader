@@ -1,125 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Koikatsu Cap Resizer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #1a202c; color: #cbd5e0; }
-    </style>
+    <title>Settings - Auto Uploader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="p-6 font-sans">
-    <div class="max-w-3xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Settings</h1>
-            <div class="flex space-x-3">
-                <a href="/setup?force=1" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Run Setup
+<body>
+    <div class="settings-wrap">
+        <div class="page-header" style="margin-bottom:0;">
+            <div class="header-brand">
+                <div class="brand-bar"></div>
+                <h1>Settings</h1>
+            </div>
+            <div class="header-actions">
+                <a href="/setup?force=1" class="btn-icon warning" data-tip="Run Setup">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </a>
-                <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                    Back
+                <a href="/" class="btn-icon" data-tip="Back to Home">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 </a>
+                <button onclick="toggleTheme()" class="btn-icon" id="theme-btn" data-tip="Toggle Theme">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
             </div>
         </div>
-        
-        <div class="bg-gray-800 p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold text-white mb-4">Watch Folders</h2>
-            <p class="text-gray-400 text-sm mb-4">Directories to automatically monitor for new screenshots.</p>
-            
-            <div id="folders-list" class="space-y-3 mb-4">
-                <!-- Folders injected here -->
-            </div>
-            
-            <div class="flex space-x-3">
-                <input type="text" id="new-folder" placeholder="e.g. /path/to/folder/" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="addFolder()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
-                    Add Folder
+
+        <!-- Watch Folders -->
+        <div class="section-card">
+            <h2>Watch Folders</h2>
+            <p class="section-desc">Directories automatically monitored for new screenshots.</p>
+            <div id="folders-list" class="list-stack"></div>
+            <div class="form-row">
+                <input type="text" id="new-folder" placeholder="/path/to/folder/">
+                <button onclick="addFolder()" class="btn-icon success" data-tip="Add Folder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
             </div>
-            
-            <hr class="border-gray-700 my-8">
-            
-            <h2 class="text-xl font-semibold text-white mb-4">API & Paths</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">Output Folder</label>
-                    <input type="text" id="output-folder" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">Catbox Userhash</label>
-                    <input type="text" id="catbox-userhash" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">ImgChest API Key</label>
-                    <input type="password" id="imgchest-api-key" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-            </div>
-            
-            <hr class="border-gray-700 my-8">
-            
-            <h2 class="text-xl font-semibold text-white mb-4">Image Settings</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">Max Width</label>
-                    <input type="number" id="max-width" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">Max Height</label>
-                    <input type="number" id="max-height" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm font-bold mb-2">JPG Quality (1-100)</label>
-                    <input type="number" id="jpg-quality" min="1" max="100" onchange="saveGeneralSettings()" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-            </div>
+        </div>
 
-            <hr class="border-gray-700 my-8">
-            
-            <h2 class="text-xl font-semibold text-white mb-4">Custom ShareX Uploaders</h2>
-            <p class="text-gray-400 text-sm mb-4">Paste ShareX custom uploader JSON configs here (as a JSON array <code class="bg-gray-900 px-1 rounded">[...]</code>) or drag & drop a <code>.sxcu</code> file.</p>
-            <div id="sxcu-dropzone" class="relative border-2 border-dashed border-transparent rounded transition-colors duration-200">
-                <textarea id="custom-uploaders" rows="8" class="bg-gray-700 text-gray-200 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder-gray-500" placeholder='[\n  {\n    "RequestURL": "https://...",\n    "FileFormName": "file"\n  }\n]'></textarea>
-                <div id="drop-overlay" class="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200 rounded">
-                    <span class="text-white font-bold text-xl drop-shadow-md">Drop .sxcu file here to add</span>
+        <!-- API & Paths -->
+        <div class="section-card">
+            <h2>API &amp; Paths</h2>
+            <div class="form-group">
+                <label>Output Folder</label>
+                <input type="text" id="output-folder" onchange="saveGeneralSettings()">
+            </div>
+            <div class="form-group">
+                <label>Catbox Userhash</label>
+                <input type="text" id="catbox-userhash" onchange="saveGeneralSettings()">
+            </div>
+            <div class="form-group">
+                <label>ImgChest API Key</label>
+                <input type="password" id="imgchest-api-key" onchange="saveGeneralSettings()">
+            </div>
+        </div>
+
+        <!-- Image Settings -->
+        <div class="section-card">
+            <h2>Image Settings</h2>
+            <div class="grid-3">
+                <div>
+                    <label>Max Width</label>
+                    <input type="number" id="max-width" onchange="saveGeneralSettings()">
+                </div>
+                <div>
+                    <label>Max Height</label>
+                    <input type="number" id="max-height" onchange="saveGeneralSettings()">
+                </div>
+                <div>
+                    <label>JPG Quality (1-100)</label>
+                    <input type="number" id="jpg-quality" min="1" max="100" onchange="saveGeneralSettings()">
                 </div>
             </div>
-            <button onclick="saveUploaders()" class="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
-                Save Custom Uploaders
+        </div>
+
+        <!-- Custom ShareX Uploaders -->
+        <div class="section-card">
+            <h2>Custom ShareX Uploaders</h2>
+            <p class="section-desc">Paste ShareX custom uploader JSON configs here (as a JSON array <code>[...]</code>) or drag &amp; drop a <code>.sxcu</code> file.</p>
+            <div id="sxcu-dropzone">
+                <textarea id="custom-uploaders" rows="8" placeholder='[\n  {\n    "RequestURL": "https://...",\n    "FileFormName": "file"\n  }\n]'></textarea>
+                <div id="drop-overlay">
+                    <span>Drop .sxcu file here</span>
+                </div>
+            </div>
+            <button onclick="saveUploaders()" class="btn-icon accent" data-tip="Save Custom Uploaders">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             </button>
-            
-            <div id="custom-uploaders-list" class="space-y-3 mt-4"></div>
+            <div id="custom-uploaders-list" class="list-stack" style="margin-top:1rem;margin-bottom:0;"></div>
+        </div>
 
-            <hr class="border-gray-700 my-8">
-            
-            <h2 class="text-xl font-semibold text-white mb-4">Upload Priority Sequence</h2>
-            <p class="text-gray-400 text-sm mb-4">Configure the exact order the app will attempt to upload your captures.</p>
-            
-            <div id="sequence-list" class="space-y-3 mb-4">
-                <!-- Sequence injected here -->
-            </div>
-            
-            <div class="flex space-x-3">
-                <select id="new-sequence-item" class="bg-gray-700 text-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-                <button onclick="addSequenceItem()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">Add</button>
-            </div>
-
-            <hr class="border-gray-700 my-8">
-            
-            <h2 class="text-xl font-semibold text-red-500 mb-4">Danger Zone</h2>
-            <div class="bg-gray-700 p-4 rounded-lg flex items-center justify-between border border-red-900">
-                <div>
-                    <h3 class="text-white font-bold">Clear History</h3>
-                    <p class="text-gray-400 text-sm mt-1">This will permanently wipe all history records from your database. Images will remain on disk.</p>
-                </div>
-                <button onclick="clearHistory()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap transition duration-200">
-                    Clear History
+        <!-- Upload Priority Sequence -->
+        <div class="section-card">
+            <h2>Upload Priority Sequence</h2>
+            <p class="section-desc">Exact order the app will attempt to upload captures.</p>
+            <div id="sequence-list" class="list-stack"></div>
+            <div class="form-row">
+                <select id="new-sequence-item"></select>
+                <button onclick="addSequenceItem()" class="btn-icon success" data-tip="Add to Sequence">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="section-card danger-card">
+            <div class="danger-zone-label">Danger Zone</div>
+            <div class="danger-row">
+                <div class="danger-row-text">
+                    <h3>Clear History</h3>
+                    <p>Permanently wipes all history records from the database. Images remain on disk.</p>
+                </div>
+                <button onclick="clearHistory()" class="btn-danger-text">Clear History</button>
             </div>
         </div>
     </div>
 
     <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const sun = document.getElementById('icon-sun');
+            const moon = document.getElementById('icon-moon');
+            if (sun && moon) {
+                sun.style.display = saved === 'light' ? 'block' : 'none';
+                moon.style.display = saved === 'dark' ? 'block' : 'none';
+            }
+        })();
+
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('icon-sun').style.display = next === 'light' ? 'block' : 'none';
+            document.getElementById('icon-moon').style.display = next === 'dark' ? 'block' : 'none';
+        }
+
+        const ICO_TRASH = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+        const ICO_UP = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
+        const ICO_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+        const ICO_FLASK = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6m-6 0v6l-4.5 9A2 2 0 0 0 6.27 21h11.46a2 2 0 0 0 1.77-2.9L15 9V3"/><line x1="6" y1="12" x2="18" y2="12"/></svg>`;
+        const ICO_SPIN = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg>`;
+        const ICO_BTN_SM = 'width:34px;height:34px;border-radius:8px;';
+
         let settings = { watch_folders: [], output_folder: "", catbox_userhash: "", imgchest_api_key: "", uploaders: [], upload_sequence: [], max_width: 2000, max_height: 2000, jpg_quality: 95 };
 
         async function fetchSettings() {
@@ -127,7 +155,6 @@
                 const response = await fetch('/api/settings');
                 settings = await response.json();
                 if (!settings.upload_sequence) settings.upload_sequence = ["catbox", "imgchest"];
-                
                 document.getElementById('output-folder').value = settings.output_folder || "";
                 document.getElementById('catbox-userhash').value = settings.catbox_userhash || "";
                 document.getElementById('imgchest-api-key').value = settings.imgchest_api_key || "";
@@ -135,7 +162,6 @@
                 document.getElementById('max-width').value = settings.max_width || 2000;
                 document.getElementById('max-height').value = settings.max_height || 2000;
                 document.getElementById('jpg-quality').value = settings.jpg_quality || 95;
-                
                 renderFolders();
                 renderSequence();
                 renderUploaders();
@@ -149,12 +175,12 @@
             list.innerHTML = '';
             settings.watch_folders.forEach((folder, index) => {
                 const el = document.createElement('div');
-                el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
+                el.className = 'list-row';
                 el.innerHTML = `
-                    <span class="text-gray-200 truncate pr-4">${folder}</span>
-                    <button onclick="removeFolder(${index})" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1 px-3 rounded transition duration-200">
-                        Remove
-                    </button>
+                    <span class="list-row-text">${folder}</span>
+                    <div class="list-row-actions">
+                        <button onclick="removeFolder(${index})" class="btn-icon danger" style="${ICO_BTN_SM}" data-tip="Remove Folder">${ICO_TRASH}</button>
+                    </div>
                 `;
                 list.appendChild(el);
             });
@@ -215,13 +241,13 @@
             if (settings.uploaders && settings.uploaders.length > 0) {
                 settings.uploaders.forEach((u, index) => {
                     const el = document.createElement('div');
-                    el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
+                    el.className = 'list-row';
                     const name = u.Name || u.RequestURL;
                     el.innerHTML = `
-                        <span class="text-gray-200 truncate pr-4">${name}</span>
-                        <button onclick="testUploader(${index}, this)" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-1 px-3 rounded transition duration-200">
-                            Test Upload
-                        </button>
+                        <span class="list-row-text">${name}</span>
+                        <div class="list-row-actions">
+                            <button onclick="testUploader(${index}, this)" class="btn-icon purple" style="${ICO_BTN_SM}" data-tip="Test Upload">${ICO_FLASK}</button>
+                        </div>
                     `;
                     list.appendChild(el);
                 });
@@ -229,11 +255,9 @@
         }
 
         async function testUploader(index, btn) {
-            const originalText = btn.innerText;
-            btn.innerText = "Testing...";
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = ICO_SPIN;
             btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            
             try {
                 const response = await fetch('/api/test_uploader', {
                     method: 'POST',
@@ -249,9 +273,8 @@
             } catch (error) {
                 alert("Error during test: " + error.message);
             } finally {
-                btn.innerText = originalText;
+                btn.innerHTML = origHTML;
                 btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
@@ -260,19 +283,22 @@
             list.innerHTML = '';
             settings.upload_sequence.forEach((dest, index) => {
                 const el = document.createElement('div');
-                el.className = "flex items-center justify-between bg-gray-700 p-3 rounded";
-                
+                el.className = 'list-row';
+
                 let label = dest;
                 if (dest === "catbox") label = "Catbox";
                 else if (dest === "imgchest") label = "ImgChest";
                 else if (dest.startsWith("sharex:")) label = "Custom: " + dest.substring(7);
 
+                const isFirst = index === 0;
+                const isLast = index === settings.upload_sequence.length - 1;
+
                 el.innerHTML = `
-                    <span class="text-gray-200 truncate pr-4">${label}</span>
-                    <div class="flex space-x-2">
-                        <button onclick="moveSequence(${index}, -1)" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded transition duration-200" ${index === 0 ? 'style="opacity: 0.5; cursor: not-allowed;" disabled' : ''}>↑</button>
-                        <button onclick="moveSequence(${index}, 1)" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded transition duration-200" ${index === settings.upload_sequence.length - 1 ? 'style="opacity: 0.5; cursor: not-allowed;" disabled' : ''}>↓</button>
-                        <button onclick="removeSequence(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition duration-200">✕</button>
+                    <span class="list-row-text">${label}</span>
+                    <div class="list-row-actions">
+                        <button onclick="moveSequence(${index}, -1)" class="btn-icon" style="${ICO_BTN_SM}" data-tip="Move Up" ${isFirst ? 'disabled' : ''}>${ICO_UP}</button>
+                        <button onclick="moveSequence(${index}, 1)" class="btn-icon" style="${ICO_BTN_SM}" data-tip="Move Down" ${isLast ? 'disabled' : ''}>${ICO_DOWN}</button>
+                        <button onclick="removeSequence(${index})" class="btn-icon danger" style="${ICO_BTN_SM}" data-tip="Remove">${ICO_TRASH}</button>
                     </div>
                 `;
                 list.appendChild(el);
@@ -284,10 +310,9 @@
             if (settings.uploaders) {
                 settings.uploaders.forEach(u => {
                     const val = "sharex:" + (u.Name || u.RequestURL);
-                    available.push({val: val, label: "Custom: " + (u.Name || u.RequestURL)});
+                    available.push({val, label: "Custom: " + (u.Name || u.RequestURL)});
                 });
             }
-            
             let hasOptions = false;
             available.forEach(opt => {
                 if (!settings.upload_sequence.includes(opt.val)) {
@@ -337,27 +362,20 @@
 
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropOverlay.classList.remove('opacity-0');
-            dropzone.classList.remove('border-transparent');
-            dropzone.classList.add('border-blue-500');
+            dropOverlay.style.opacity = '1';
+            dropzone.style.borderColor = 'var(--accent)';
         });
-
         dropzone.addEventListener('dragleave', (e) => {
             e.preventDefault();
-            dropOverlay.classList.add('opacity-0');
-            dropzone.classList.add('border-transparent');
-            dropzone.classList.remove('border-blue-500');
+            dropOverlay.style.opacity = '0';
+            dropzone.style.borderColor = 'transparent';
         });
-
         dropzone.addEventListener('drop', async (e) => {
             e.preventDefault();
-            dropOverlay.classList.add('opacity-0');
-            dropzone.classList.add('border-transparent');
-            dropzone.classList.remove('border-blue-500');
-
+            dropOverlay.style.opacity = '0';
+            dropzone.style.borderColor = 'transparent';
             const file = e.dataTransfer.files[0];
             if (!file) return;
-
             try {
                 const text = await file.text();
                 const parsed = JSON.parse(text);

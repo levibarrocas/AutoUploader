@@ -1,54 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup - Resizer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Setup - Auto Uploader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="p-6 font-sans flex items-center justify-center min-h-screen bg-gray-900">
-    <div class="w-full max-w-lg bg-gray-800 p-8 rounded-lg shadow-lg">
-        <h1 class="text-3xl font-bold text-white mb-6 text-center">First Time Setup</h1>
-        <p class="text-gray-400 mb-6 text-center">Please configure where your screenshots come from and where they should be saved.</p>
-        
-        <div class="space-y-6">
-            <div>
-                <label class="block text-gray-400 text-sm font-bold mb-2">Watch Folder (Source directory)</label>
-                <input type="text" id="watch-folder" placeholder="/path/to/game/cap/" class="bg-gray-700 text-gray-200 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div>
-                <label class="block text-gray-400 text-sm font-bold mb-2">Output Folder (Destination directory)</label>
-                <input type="text" id="output-folder" placeholder="/path/to/save/resized/" class="bg-gray-700 text-gray-200 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            
-            <button onclick="finishSetup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200">
-                Save & Start
-            </button>
+<body class="centered-layout">
+    <button onclick="toggleTheme()" class="theme-toggle-fixed" id="theme-btn">
+        <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <div class="setup-card">
+        <div class="card-header">
+            <div class="brand-bar"></div>
+            <h1>First Time Setup</h1>
         </div>
+        <p class="card-desc">Configure where your screenshots come from and where they should be saved.</p>
+
+        <div class="form-group">
+            <label>Watch Folder — Source directory</label>
+            <input type="text" id="watch-folder" placeholder="/path/to/game/cap/">
+        </div>
+        <div class="form-group">
+            <label>Output Folder — Destination directory</label>
+            <input type="text" id="output-folder" placeholder="/path/to/save/resized/">
+        </div>
+
+        <button onclick="finishSetup()" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; Start
+        </button>
     </div>
 
     <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const sun = document.getElementById('icon-sun');
+            const moon = document.getElementById('icon-moon');
+            if (sun && moon) {
+                sun.style.display = saved === 'light' ? 'block' : 'none';
+                moon.style.display = saved === 'dark' ? 'block' : 'none';
+            }
+        })();
+
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('icon-sun').style.display = next === 'light' ? 'block' : 'none';
+            document.getElementById('icon-moon').style.display = next === 'dark' ? 'block' : 'none';
+        }
+
         async function finishSetup() {
             const watchFolder = document.getElementById('watch-folder').value.trim();
             const outputFolder = document.getElementById('output-folder').value.trim();
-            
+
             if (!watchFolder || !outputFolder) {
                 alert("Please provide both watch and output folders.");
                 return;
             }
-            
+
             const response = await fetch('/api/settings');
             let settings = await response.json();
-            
             settings.watch_folders = [watchFolder];
             settings.output_folder = outputFolder;
-            
+
             await fetch('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             });
-            
+
             window.location.href = '/';
         }
     </script>
